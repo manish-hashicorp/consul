@@ -72,6 +72,9 @@ type ConsulResolver struct {
 	// Name of the query target.
 	Name string
 
+	// Tag is query target tag value.
+	Tag string
+
 	// Type of the query target. Should be one of the defined ConsulResolverType*
 	// constants. Currently defaults to ConsulResolverTypeService.
 	Type int
@@ -96,7 +99,7 @@ func (cr *ConsulResolver) Resolve(ctx context.Context) (string, connect.CertURI,
 func (cr *ConsulResolver) resolveService(ctx context.Context) (string, connect.CertURI, error) {
 	health := cr.Client.Health()
 
-	svcs, _, err := health.Connect(cr.Name, "", true, cr.queryOptions(ctx))
+	svcs, _, err := health.Connect(cr.Name, cr.Tag, true, cr.queryOptions(ctx))
 	if err != nil {
 		return "", nil, err
 	}
