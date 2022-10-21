@@ -2797,7 +2797,7 @@ func (r *TombstoneRequest) RequestDatacenter() string {
 
 // MsgpackHandle is a shared handle for encoding/decoding msgpack payloads
 var MsgpackHandle = &codec.MsgpackHandle{
-	//RawToString: true,
+	RawToString: true,
 	BasicHandle: codec.BasicHandle{
 		DecodeOptions: codec.DecodeOptions{
 			MapType: reflect.TypeOf(map[string]interface{}{}),
