@@ -333,9 +333,11 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	r := h.c.newRequest("GET", path)
 	r.setQueryOptions(q)
 	if len(tags) > 0 {
-		for _, tag := range tags {
-			r.params.Add("tag", tag)
-		}
+		r.params.Add("filter", fmt.Sprintf("Service.Tag contains %q", tags[0]))
+
+		//for _, tag := range tags {
+		//	r.params.Add("filter", tag)
+		//}
 	}
 	if passingOnly {
 		r.params.Set(HealthPassing, "1")
