@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -333,15 +334,14 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	r := h.c.newRequest("GET", path)
 	r.setQueryOptions(q)
 	if len(tags) > 0 {
-		r.params.Add("filter", fmt.Sprintf("Service.Tag contains %q", tags[0]))
-
-		//for _, tag := range tags {
-		//	r.params.Add("filter", tag)
-		//}
+		for _, tag := range tags {
+			r.params.Add("tag", tag)
+		}
 	}
 	if passingOnly {
 		r.params.Set(HealthPassing, "1")
 	}
+	fmt.Fprintf(os.Stderr, "manish-consul: requesting lookup of %q service with %q tags\n", service, tags)
 	rtt, resp, err := h.c.doRequest(r)
 	if err != nil {
 		return nil, nil, err
@@ -359,6 +359,7 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
 	}
+	fmt.Fprintf(os.Stderr, "manish-consul: got services: %v\n", out)
 	return out, qm, nil
 }
 
