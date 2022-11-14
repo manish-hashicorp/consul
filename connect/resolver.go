@@ -117,9 +117,18 @@ func (cr *ConsulResolver) resolveService(ctx context.Context) (string, connect.C
 
 	// Services are not shuffled by HTTP API, pick one at (pseudo) random.
 	idx := 0
-	if len(svcs) > 1 {
-		idx = rand.Intn(len(svcs))
+	// Manish temp: filter based on tag
+	for i, svc := range svcs {
+		for _, tag := range svc.Service.Tags {
+			if tag == cr.Tag {
+				idx = i
+			}
+		}
 	}
+	//
+	//if len(svcs) > 1 {
+	//	idx = rand.Intn(len(svcs))
+	//}
 
 	return cr.resolveServiceEntry(svcs[idx])
 }
