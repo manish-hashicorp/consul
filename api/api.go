@@ -368,6 +368,8 @@ type Config struct {
 	Partition string
 
 	TLSConfig TLSConfig
+
+	Logger hclog.Logger
 }
 
 // TLSConfig is used to generate a TLSClientConfig that's useful for talking to
@@ -449,6 +451,7 @@ func defaultConfig(logger hclog.Logger, transportFn func() *http.Transport) *Con
 		Address:   "127.0.0.1:8500",
 		Scheme:    "http",
 		Transport: transportFn(),
+		Logger:    logger,
 	}
 
 	if addr := os.Getenv(HTTPAddrEnvName); addr != "" {

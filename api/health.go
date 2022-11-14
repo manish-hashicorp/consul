@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 )
@@ -330,6 +329,7 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	default:
 		path = "/v1/health/service/" + service
 	}
+	logger := h.c.config.Logger.Named("health.service")
 
 	r := h.c.newRequest("GET", path)
 	r.setQueryOptions(q)
@@ -341,7 +341,7 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	if passingOnly {
 		r.params.Set(HealthPassing, "1")
 	}
-	fmt.Fprintf(os.Stderr, "manish-consul: requesting lookup of %q service with %q tags\n", service, tags)
+	logger.Debug("requesting lookup of service with tags", "service", service, "tags", tags, "params", r.params)
 	rtt, resp, err := h.c.doRequest(r)
 	if err != nil {
 		return nil, nil, err
@@ -359,7 +359,7 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
 	}
-	fmt.Fprintf(os.Stderr, "manish-consul: got services: %v\n", out)
+	logger.Debug("looked up services", "out", out)
 	return out, qm, nil
 }
 

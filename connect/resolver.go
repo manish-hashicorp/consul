@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/consul/agent/connect"
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/ipaddr"
+	"github.com/hashicorp/go-hclog"
 )
 
 // Resolver is the interface implemented by a service discovery mechanism to get
@@ -81,6 +82,8 @@ type ConsulResolver struct {
 
 	// Datacenter to resolve in, empty indicates agent's local DC.
 	Datacenter string
+
+	Logger hclog.Logger
 }
 
 // Resolve performs service discovery against the local Consul agent and returns
@@ -99,7 +102,11 @@ func (cr *ConsulResolver) Resolve(ctx context.Context) (string, connect.CertURI,
 func (cr *ConsulResolver) resolveService(ctx context.Context) (string, connect.CertURI, error) {
 	health := cr.Client.Health()
 
+	logger := cr.Logger.Named("resolveService").With("name", cr.Name, "tag", cr.Tag)
+	logger.Debug("going to resolve service")
+
 	svcs, _, err := health.Connect(cr.Name, cr.Tag, true, cr.queryOptions(ctx))
+	logger.Debug("resolved services", "services", svcs, "error", err)
 	if err != nil {
 		return "", nil, err
 	}
