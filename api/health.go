@@ -301,6 +301,7 @@ func (h *Health) ServiceMultipleTags(service string, tags []string, passingOnly 
 // passingOnly is true only instances where both the service and any proxy are
 // healthy will be returned.
 func (h *Health) Connect(service, tag string, passingOnly bool, q *QueryOptions) ([]*ServiceEntry, *QueryMeta, error) {
+	h.c.config.Logger.Debug("in Health.Connect")
 	var tags []string
 	if tag != "" {
 		tags = []string{tag}
@@ -320,6 +321,7 @@ func (h *Health) Ingress(service string, passingOnly bool, q *QueryOptions) ([]*
 }
 
 func (h *Health) service(service string, tags []string, passingOnly bool, q *QueryOptions, healthType string) ([]*ServiceEntry, *QueryMeta, error) {
+	h.c.config.Logger.Debug("in Health.service")
 	var path string
 	switch healthType {
 	case connectHealth:
@@ -329,7 +331,7 @@ func (h *Health) service(service string, tags []string, passingOnly bool, q *Que
 	default:
 		path = "/v1/health/service/" + service
 	}
-	logger := h.c.config.Logger.Named("health.service")
+	logger := h.c.config.Logger.Named("Health.service")
 
 	r := h.c.newRequest("GET", path)
 	r.setQueryOptions(q)
